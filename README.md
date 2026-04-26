@@ -36,6 +36,60 @@
 - Создайте БД командой `python3 manage.py migrate`
 - Запустите сервер командой `python3 manage.py runserver`
 
+## Скрипты
+Для начала нужно открыть `shell` командой:
+```
+python manage.py shell
+```
+
+
+Чтобы создать переменную с __Ваней__, нужно ввести:
+```
+vanya=Schoolkid.objects.filter(full_name__contains="Фролов Иван")[0]
+```
+
+
+Чтобы __поменять__ все __плохие оценки__ на __хорошие__, нужно ввести:
+```
+def fix_marks(schoolkid):
+    fix_marks = Mark.objects.filter(schoolkid=schoolkid, points__in=['2','3']).update(points='5')
+
+
+fix_marks(vanya) # для вызова функции
+```
+
+
+Чтобы убрать все __замечания__, нужно ввести:
+```
+def remove_chastisements(schoolkid):
+    Chastisement.objects.filter(schoolkid=schoolkid).delete()
+
+
+remove_chastisements(vanya) # для вызова функции
+```
+
+
+Для добавления __похвалы__, нужно ввести:
+```
+import random
+
+
+rand_commend=["лев просто", "прям молодой эйнштейн", "вот руку пожал бы", "красавчик", "научился думать", "впервые чото умное сказал"] # случайная похвала
+
+
+def create_commendation(schoolkid, subject):
+    lesson=Lesson.objects.filter(year_of_study=schoolkid.year_of_study, group_letter=schoolkid.group_letter, subject__title__contains=subject)[0]
+    Commendation.objects.create(text=random.choice(rand_commend), created=lesson.date, schoolkid=schoolkid, subject=lesson.subject,teacher=lesson.teacher)
+
+
+create_commendation(vanya, "Предмет") # для вызова функции
+
+
+# можно проверить добавление при помощи команды
+Commendation.objects.filter(schoolkid=vanya, subject__title__contains="Предмет")
+```
+
+
 ## Переменные окружения
 
 Часть настроек проекта берётся из переменных окружения. Чтобы их определить, создайте файл `.env` рядом с `manage.py` и запишите туда данные в таком формате: `ПЕРЕМЕННАЯ=значение`.
