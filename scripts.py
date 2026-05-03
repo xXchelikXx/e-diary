@@ -1,0 +1,66 @@
+import random
+
+import time
+
+
+def find_schoolkid(schoolkid_name):
+    schoolkid = []
+    schoolkid = Schoolkid.objects.filter(full_name__contains = schoolkid_name)
+    if schoolkid.count() >= 2:
+        print("Найдено несколько результатов. Уточните имя.")
+    elif schoolkid.count() < 1:
+        print("Ученик не найден.")
+    else:
+        print("Ученик найден.")
+        schoolkid = schoolkid[0]
+    return schoolkid
+
+
+def fix_marks(schoolkid):
+    bad_marks = Mark.objects.filter(schoolkid = schoolkid,
+                                    points__in = ['2', '3'])
+    print("Нахождение и изменение оценок...")
+    if bad_marks.count() >= 1:
+        time.sleep(random.randint(2, 5))
+        Mark.objects.filter(schoolkid = schoolkid,
+                            points__in = ['2', '3']).update(points = '5')
+        print("Оценки изменены.")
+    else:
+        print("Нет плохих оценок.")
+
+
+def remove_chastisements(schoolkid):
+    chastisements = Chastisement.objects.filter(schoolkid = schoolkid)
+    if chastisements.count() >= 1:
+        print("Нахождение и удаление замечаний...")
+        time.sleep(random.randint(2, 5))
+        Chastisement.objects.filter(schoolkid = schoolkid).delete()
+        print("Все замечания удалены.")
+    else:
+        print("Нет замечаний.")
+
+
+def create_commendation(schoolkid, subject):
+    lesson=Lesson.objects.filter(year_of_study=schoolkid.year_of_study,
+                                 group_letter=schoolkid.group_letter,
+                                 subject__title__contains=subject)[0]
+    Commendation.objects.create(text=random.choice(commendations),
+                                created=lesson.date,
+                                schoolkid=schoolkid,
+                                subject=lesson.subject,
+                                teacher=lesson.teacher)
+
+
+def main():
+    #fix_marks(schoolkid) исправление оценок
+    #remove_chastisements(schoolkid) убрать замечания
+    #create_commendation(schoolkid, subject) создать похвалу
+    commendations=["лев просто",
+                   "прям молодой эйнштейн",
+                   "вот руку пожал бы", "красавчик",
+                   "научился думать",
+                   "впервые чото умное сказал"] # случайная похвала
+
+
+if __name__ == "__main__":
+    main()
