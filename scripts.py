@@ -2,6 +2,8 @@ import random
 
 import time
 
+from datacenter import modelds
+
 
 def find_schoolkid(schoolkid_name):
     schoolkid = []
@@ -12,7 +14,7 @@ def find_schoolkid(schoolkid_name):
         print("Ученик не найден.")
     else:
         print("Ученик найден.")
-        schoolkid = schoolkid[0]
+        schoolkid = schoolkid.first()
     return schoolkid
 
 
@@ -41,25 +43,27 @@ def remove_chastisements(schoolkid):
 
 
 def create_commendation(schoolkid, subject):
-    lesson=Lesson.objects.filter(year_of_study=schoolkid.year_of_study,
-                                 group_letter=schoolkid.group_letter,
-                                 subject__title__contains=subject)[0]
-    Commendation.objects.create(text=random.choice(commendations),
-                                created=lesson.date,
-                                schoolkid=schoolkid,
-                                subject=lesson.subject,
-                                teacher=lesson.teacher)
+    lessons = Lesson.objects.filter(year_of_study=schoolkid.year_of_study,
+                                    group_letter=schoolkid.group_letter,
+                                    subject__title__contains=subject)
+    if lessons:
+        random_lesson = random.choice(lessons)
+        Commendation.objects.create(text=random.choice(commendations),
+                                    created=random_lesson.date,
+                                    schoolkid=schoolkid,
+                                    subject=random_lesson.subject,
+                                    teacher=random_lesson.teacher)
+    else:
+        print("Урок не найден")
+        return
 
 
 def main():
-    #fix_marks(schoolkid) исправление оценок
-    #remove_chastisements(schoolkid) убрать замечания
-    #create_commendation(schoolkid, subject) создать похвалу
     commendations=["лев просто",
                    "прям молодой эйнштейн",
                    "вот руку пожал бы", "красавчик",
                    "научился думать",
-                   "впервые чото умное сказал"] # случайная похвала
+                   "впервые чото умное сказал"]
 
 
 if __name__ == "__main__":
